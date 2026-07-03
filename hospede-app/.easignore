@@ -1,0 +1,9 @@
+# EAS Build ignora os mesmos arquivos do .gitignore por padrão.
+# Este arquivo existe para garantir exclusões explícitas e reduzir o tamanho do upload.
+
+node_modules/
+.expo/
+dist/
+web-build/
+android/
+ios/

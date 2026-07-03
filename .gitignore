@@ -1,0 +1,19 @@
+# Ambientes virtuais
+venv/
+.venv/
+env/
+
+# Django e Python
+*.pyc
+__pycache__/
+db.sqlite3
+.env
+
+# Node/React
+node_modules/
+build/
+.DS_Store
+
+# Firmware — credenciais reais (Wi-Fi, HiveMQ)
+firmware/main/secrets.h
+

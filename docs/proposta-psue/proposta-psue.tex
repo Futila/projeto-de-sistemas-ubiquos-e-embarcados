@@ -1,0 +1,724 @@
+% ============================================================
+% Proposta de Projeto — Disciplina de Projeto de Sistemas
+% Ubíquos e Embarcados — UFSC Araranguá — 2026.1
+% ============================================================
+\documentclass[12pt,a4paper]{article}
+
+% ---- Codificação e idioma ----
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[brazil]{babel}
+
+% ---- Margens e espaçamento (NBR-like) ----
+\usepackage[top=3cm, bottom=2cm, left=3cm, right=2cm]{geometry}
+\usepackage{setspace}
+\onehalfspacing
+
+% ---- Tipografia ----
+\usepackage{lmodern}
+\usepackage{microtype}
+
+% ---- Links e referências ----
+\usepackage[hidelinks]{hyperref}
+\usepackage{url}
+
+% ---- Figuras e tabelas ----
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{longtable}
+\usepackage{caption}
+
+% ---- TikZ para os diagramas ----
+\usepackage{tikz}
+\usetikzlibrary{shapes.geometric, arrows.meta, positioning, automata, calc, fit}
+
+% ---- Listas ----
+\usepackage{enumitem}
+
+% ---- Cabeçalho / rodapé ----
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\rhead{\small Projeto de Sistemas Ubíquos e Embarcados — 2026.1}
+\lhead{\small UFSC Araranguá}
+\cfoot{\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+
+% ---- Seções sem numeração romana ----
+\renewcommand{\thesection}{\arabic{section}}
+
+% ============================================================
+\begin{document}
+\selectlanguage{brazil}
+
+% ============================================================
+% CAPA
+% ============================================================
+\begin{titlepage}
+  \centering
+  {\large Universidade Federal de Santa Catarina\\
+         Centro de Ciências, Tecnologias e Saúde\\
+         Campus Araranguá\\[2mm]
+         Curso de Engenharia de Computação}
+
+  \vspace{3cm}
+
+  {\LARGE\bfseries Controle de Acesso Inteligente para\\
+  Imóveis de Aluguel por Temporada\\
+  Baseado em IoT com ESP32 e MQTT}
+
+  \vspace{1.5cm}
+
+  {\large\textbf{Modelo de Proposta de Projeto}}\\[4mm]
+  {\large Projeto de Sistemas Ubíquos e Embarcados — 2026.1}
+
+  \vfill
+
+  \begin{flushleft}
+    \textbf{Alunos:}\\[2mm]
+    1.\ Fernando Doqui Futila
+  \end{flushleft}
+
+  \vspace{2cm}
+  {\large Araranguá, maio de 2026}
+\end{titlepage}
+
+% ============================================================
+% SUMÁRIO
+% ============================================================
+\tableofcontents
+\newpage
+
+% ============================================================
+\section{Introdução}
+% ============================================================
+
+\subsection{Contextualização e Relevância do Tema}
+
+O fenômeno da economia compartilhada, consolidado globalmente por plataformas como
+Airbnb e Booking.com, transformou unidades residenciais convencionais em ativos de
+hotelaria dinâmica. Essa transição, no entanto, impõe desafios de infraestrutura
+significativos, uma vez que os sistemas de controle de acesso tradicionais não possuem
+a granularidade necessária para gerenciar hóspedes de curta duração.
+
+A automação residencial, antes vista apenas como um item de luxo, tornou-se uma
+ferramenta de gestão essencial para garantir a viabilidade operacional e a segurança
+desses imóveis. Neste contexto, a Internet das Coisas (IoT) surge como o elo
+tecnológico capaz de resolver essa lacuna, permitindo a digitalização da barreira
+física através de dispositivos conectados à rede mundial de computadores.
+
+Os sistemas ubíquos e embarcados são protagonistas nesse cenário: microcontroladores
+de baixo custo como o ESP32 combinam conectividade Wi-Fi, capacidade de processamento
+local e interface com sensores físicos em um único chip, viabilizando soluções que
+antes exigiam hardware proprietário de alto custo.
+
+\subsection{Justificativa}
+
+A justificativa deste trabalho fundamenta-se na carência de soluções que integrem,
+em um único ecossistema de baixo custo, o controle de acesso temporário e o
+monitoramento ambiental reativo. Embora existam protótipos acadêmicos e produtos
+comerciais de alto custo, poucos conseguem atender simultaneamente aos requisitos de:
+\begin{enumerate}
+  \item Geração e expiração automática de credenciais vinculadas ao calendário de
+        reservas;
+  \item Gestão eficiente de múltiplos usuários e propriedades;
+  \item Integração nativa com sensores de segurança (gás, fumaça e temperatura);
+  \item Baixo custo de replicação através de hardware \emph{open-source}.
+\end{enumerate}
+
+A maioria das fechaduras inteligentes comerciais é voltada para uso residencial fixo,
+apresentando limitações críticas para o modelo de aluguel: incapacidade de gerar
+credenciais temporárias automáticas, necessidade de interação presencial para
+configuração e ausência de integração com sensores ambientais que monitorem a
+integridade do imóvel durante a estadia.
+
+\subsection{Problemática}
+
+O problema central reside na falta de interoperabilidade e na dependência de
+conectividade constante. Sistemas baseados puramente em nuvem falham quando a rede
+local do imóvel apresenta instabilidade, enquanto sistemas puramente locais (como
+teclados de senha fixa) não permitem a revogação dinâmica de acessos.
+
+Além disso, a segurança patrimonial em imóveis alugados é frequentemente negligenciada:
+vazamentos de gás ou princípios de incêndio podem ocorrer sem que o proprietário seja
+notificado ou que o sistema de acesso tome medidas automáticas para facilitar a
+evacuação ou o socorro.
+
+A gestão de chaves físicas ainda é uma realidade para muitos anfitriões, gerando:
+\begin{itemize}
+  \item Custos logísticos de deslocamento para entrega e recolhimento de chaves;
+  \item Riscos de duplicação não autorizada;
+  \item Total ausência de auditoria sobre quem acessa a propriedade e em quais horários.
+\end{itemize}
+
+\subsection{Objetivo Geral}
+
+Este projeto tem como objetivo desenvolver e validar uma solução de controle de acesso
+inteligente baseada em IoT, voltada especificamente para imóveis de aluguel por
+temporada, integrando o gerenciamento remoto de chaves digitais e o monitoramento
+preventivo de sensores ambientais, por meio de um dispositivo embarcado de baixo custo
+(ESP32) conectado a uma plataforma \emph{backend} Django via protocolo MQTT sobre
+HiveMQ Cloud.
+
+% ============================================================
+\section{Trabalhos Relacionados}
+% ============================================================
+
+A pesquisa sobre fechaduras inteligentes avançou significativamente com a
+popularização de microcontroladores de baixo custo. Contudo, a aplicação voltada
+especificamente para o mercado de locação por temporada ainda apresenta lacunas
+operacionais. A seguir são apresentados os principais trabalhos relacionados
+identificados na literatura.
+
+\subsection*{Trabalho 1 — Smart Lock System Using BLE and Multi-Factor Authentication}
+
+Proposta de arquitetura centrada em Bluetooth Low Energy (BLE) que exige autenticação
+multifator para liberar a porta. Embora ofereça alta segurança contra clonagem de
+sinal, a dependência da proximidade física do hóspede dificulta a gestão remota e a
+auditoria em tempo real, uma vez que os registros não são sincronizados
+instantaneamente com a nuvem. Não há integração com sensores ambientais.
+
+\subsection*{Trabalho 2 — Temporary QR Code-Based Access Control for Short-Term Rentals}
+
+Propõe o uso de QR Codes temporários gerados pelo servidor para abertura de portas.
+A principal vantagem é a capacidade de operar \emph{offline}, mas a solução carece de
+um mecanismo de revogação imediata: caso um hóspede precise ser impedido de entrar
+antes do fim do prazo, o código físico ou digital em sua posse continuaria válido até
+a expiração local. Não há monitoramento ambiental.
+
+\subsection*{Trabalho 3 — Retrofit de Fechaduras Tradicionais com Microcontroladores e
+Identificação por MAC Address}
+
+Foca no \emph{retrofit} de fechaduras tradicionais, minimizando custos de instalação.
+Entretanto, a segurança baseada apenas no endereço MAC do dispositivo móvel é
+insuficiente para o mercado de aluguel profissional, dado que esse identificador pode
+ser falsificado por softwares comuns, e não há suporte a múltiplos usuários com janelas
+temporais distintas.
+
+\subsection*{Trabalho 4 — IoT-Based Home Automation and Security System Using MQTT and ESP8266}
+
+Sistema de automação residencial baseado em MQTT com ESP8266 que integra controle
+de iluminação, temperatura e alarmes. Demonstra a viabilidade do protocolo MQTT
+para ambientes com recursos limitados, mas não trata o ciclo de vida de credenciais
+temporárias nem o conceito de "servidor interceptador" — os comandos podem ser
+publicados diretamente no broker por qualquer cliente autenticado, sem validação de
+regras de negócio.
+
+\subsection*{Trabalho 5 — Secure Access Control System for IoT Using Token-Based Authentication
+and Cloud Broker}
+
+Propõe um sistema de controle de acesso IoT com autenticação por token JWT e broker
+MQTT em nuvem. A solução é mais próxima da proposta deste projeto, porém não contempla
+o monitoramento de sensores ambientais (gás, fumaça, temperatura) integrado ao mesmo
+dispositivo, nem o fluxo de resgate de credencial pelo hóspede sem criação de conta
+formal.
+
+\bigskip
+\noindent Ao comparar as soluções existentes, percebe-se que nenhuma integra
+simultaneamente o controle de acesso temporal dinâmico com a segurança reativa baseada
+em sensores ambientais. É nesta lacuna que o presente trabalho se posiciona, oferecendo
+uma plataforma integrada que prioriza tanto a conveniência do hóspede quanto a
+integridade do patrimônio do anfitrião.
+
+% ============================================================
+\section{Requisitos do Sistema}
+% ============================================================
+
+\subsection{Requisitos Funcionais}
+
+\begin{longtable}{p{1.100cm} p{3.800cm} p{10.00cm}}
+  \toprule
+  \textbf{\#} & \textbf{Módulo} & \textbf{Descrição} \\
+  \midrule
+  \endfirsthead
+  \toprule
+  \textbf{\#} & \textbf{Módulo} & \textbf{Descrição} \\
+  \midrule
+  \endhead
+  \bottomrule
+  \endfoot
+
+  RF01 & Autenticação & O sistema deve permitir que anfitriões se registrem com nome,
+         e-mail e senha, e façam login com geração de token de autenticação. \\[3pt]
+
+  RF02 & Gestão de fechaduras & O anfitrião deve poder cadastrar, editar e remover
+         fechaduras eletrônicas, associadas por endereço MAC do ESP32. \\[3pt]
+
+  RF03 & Abertura remota & O anfitrião deve poder acionar a abertura da fechadura
+         remotamente pela interface web, mediante publicação de comando MQTT. \\[3pt]
+
+  RF04 & Acesso temporário & O sistema deve gerar tokens de resgate de 12 caracteres
+         hexadecimais, com janela temporal de validade definida (início e fim de reserva). \\[3pt]
+
+  RF05 & Ciclo de vida do acesso & O status do acesso temporário deve seguir a máquina
+         de estados: \texttt{PENDENTE} $\rightarrow$ \texttt{AGENDADO} $\rightarrow$
+         \texttt{ATIVO} $\rightarrow$ \texttt{EXPIRADO} / \texttt{REVOGADO}. \\[3pt]
+
+  RF06 & Resgate de token pelo hóspede & O hóspede deve poder resgatar o token via
+         aplicativo mobile sem necessidade de criar conta no sistema. \\[3pt]
+
+  RF07 & Abertura pelo hóspede & O sistema deve validar a janela temporal da reserva
+         antes de publicar o comando de abertura, rejeitando acessos fora do período. \\[3pt]
+
+  RF08 & Revogação de acesso & O anfitrião deve poder revogar um acesso temporário
+         ativo a qualquer momento, impedindo novas aberturas imediatamente. \\[3pt]
+
+  RF09 & Telemetria de sensores & O firmware deve publicar leituras dos sensores
+         (temperatura, umidade, concentração de gás) a cada intervalo configurável. \\[3pt]
+
+  RF10 & Monitoramento ambiental & O sistema deve registrar alertas automáticos quando
+         o sensor de gás ultrapassar limiar de risco, atuando de forma autônoma no
+         firmware (abertura preventiva do relé) sem depender de conectividade. \\[3pt]
+
+  RF11 & Heartbeat e status online & O firmware deve publicar mensagem de heartbeat
+         \texttt{"ONLINE"} a cada 30 segundos; a desconexão deve atualizar o campo
+         \texttt{esta\_online} via Last Will Testament (LWT). \\[3pt]
+
+  RF12 & Histórico de eventos & O sistema deve registrar todos os eventos de acesso,
+         alertas de sensor e eventos de sistema em log auditável com timestamp. \\[3pt]
+
+  RF13 & Interface web (dashboard) & Deve existir painel web responsivo para anfitriões
+         com telas de fechaduras, reservas, logs e perfil. \\[3pt]
+
+  RF14 & Aplicativo mobile & Deve existir aplicativo mobile para hóspedes (iOS e
+         Android) para resgate de token e abertura da porta. \\[3pt]
+\end{longtable}
+
+\subsection{Requisitos Não Funcionais}
+
+\begin{longtable}{p{1.100cm} p{3.800cm} p{10.00cm}}
+  \toprule
+  \textbf{\#} & \textbf{Categoria} & \textbf{Descrição} \\
+  \midrule
+  \endfirsthead
+  \toprule
+  \textbf{\#} & \textbf{Categoria} & \textbf{Descrição} \\
+  \midrule
+  \endhead
+  \bottomrule
+  \endfoot
+
+  RNF01 & Segurança & Toda comunicação entre backend e broker MQTT deve utilizar TLS
+          (porta 8883) com autenticação por usuário e senha. \\[3pt]
+
+  RNF02 & Segurança & Nenhuma interface de usuário (web ou mobile) deve se comunicar
+          diretamente com o broker MQTT ou com o hardware (padrão Servidor Interceptador). \\[3pt]
+
+  RNF03 & Segurança & A API REST deve exigir token de autenticação em todos os
+          endpoints de anfitrião; endpoints de hóspede autenticam-se pelo token\_resgate. \\[3pt]
+
+  RNF04 & Precisão de dados & Valores de sensores devem ser preservados com no mínimo
+          4 algarismos significativos em toda a cadeia: firmware $\rightarrow$ MQTT
+          $\rightarrow$ banco de dados $\rightarrow$ interface. \\[3pt]
+
+  RNF05 & Desempenho & A latência entre o acionamento do botão de abertura na interface
+          e a atuação do relé no ESP32 deve ser inferior a 3 segundos em condições
+          normais de rede. \\[3pt]
+
+  RNF06 & Disponibilidade & O firmware deve operar de forma autônoma para eventos de
+          emergência (detecção de gás) independentemente da disponibilidade da rede. \\[3pt]
+
+  RNF07 & Escalabilidade & A arquitetura backend deve suportar múltiplos anfitriões,
+          múltiplas fechaduras e múltiplos hóspedes simultâneos. \\[3pt]
+
+  RNF08 & Portabilidade & O backend deve ser independente de motor de banco de dados,
+          suportando SQLite3 (desenvolvimento) e PostgreSQL (produção) sem alterações
+          no código-fonte. \\[3pt]
+
+  RNF09 & Usabilidade & O dashboard web deve ser responsivo e funcional em resoluções
+          a partir de 768px. O aplicativo mobile deve funcionar nos sistemas iOS e
+          Android via Expo. \\[3pt]
+
+  RNF10 & Rastreabilidade & Todo evento de acesso, alerta ou sistema deve ser
+          persistido com timestamp em \texttt{HistoricoEvento} para fins de auditoria. \\[3pt]
+
+  RNF11 & Custo de hardware & O custo total dos componentes de hardware por unidade
+          instalada (ESP32 + sensores + relé) deve ser inferior a R\$100,00. \\[3pt]
+\end{longtable}
+
+% ============================================================
+\section{Proposta / Desenvolvimento}
+% ============================================================
+
+\subsection{Descrição da Solução}
+
+A proposta consiste no desenvolvimento de um ecossistema de controle de acesso
+inteligente para imóveis de aluguel por temporada, composto por quatro camadas
+integradas: firmware embarcado em ESP32, servidor backend Django, painel web
+para anfitriões e aplicativo mobile para hóspedes.
+
+O sistema adota a arquitetura denominada \textbf{Servidor Interceptador}: nenhuma
+interface de usuário se comunica diretamente com o hardware. Todo comando de abertura
+obrigatoriamente passa pelo servidor Django, que valida regras de negócio (identidade
+do solicitante, janela temporal da reserva) antes de publicar o payload \texttt{"OPEN"}
+no tópico MQTT correspondente ao dispositivo. O ESP32, que mantém subscrição nesse
+tópico via HiveMQ Cloud (TLS 8883), recebe o comando e aciona o relé da fechadura.
+
+O fluxo completo de um acesso temporário envolve:
+\begin{enumerate}
+  \item O anfitrião cadastra a fechadura com o endereço MAC do ESP32 pelo dashboard;
+  \item O anfitrião cria uma reserva, definindo o e-mail do hóspede e o período;
+  \item O sistema gera automaticamente um token de resgate de 12 caracteres hexadecimais;
+  \item O hóspede insere o token no aplicativo, que valida junto ao servidor
+        (status: \texttt{PENDENTE} $\to$ \texttt{AGENDADO});
+  \item Dentro da janela reservada, o hóspede pressiona "Abrir Porta"; o servidor
+        valida a janela temporal e publica \texttt{"OPEN"} no tópico MQTT;
+  \item O ESP32 recebe o comando e aciona o relé; o evento é registrado no histórico.
+\end{enumerate}
+
+Paralelamente, o firmware publica telemetria de sensores (temperatura, umidade,
+concentração de gás) a cada 30 segundos. Em caso de detecção de gás acima do limiar
+de risco, o firmware atua de forma autônoma — abrindo o relé para evacuação — sem
+depender da conectividade com o servidor.
+
+\subsection{Diagrama Esquemático da Arquitetura do Sistema}
+
+A Figura~\ref{fig:arq-sistema} apresenta o diagrama de arquitetura do sistema,
+ilustrando as quatro camadas (interfaces, servidor, mensageria e hardware) e os
+canais de comunicação entre elas.
+
+\begin{figure}[H]
+  \caption{Diagrama de arquitetura do sistema — padrão Servidor Interceptador.}
+  \label{fig:arq-sistema}
+  \centering
+  \begin{tikzpicture}[>=Stealth,
+    frontend/.style={rectangle, rounded corners=4pt, draw=blue!70!black,
+      fill=blue!8, minimum width=3.8cm, minimum height=1.1cm,
+      align=center, font=\small},
+    backend/.style={rectangle, rounded corners=4pt, draw=teal!70!black,
+      fill=teal!8, minimum width=6.5cm, minimum height=1.1cm,
+      align=center, font=\small},
+    broker/.style={rectangle, rounded corners=4pt, draw=orange!70!black,
+      fill=orange!8, minimum width=6.5cm, minimum height=1.1cm,
+      align=center, font=\small},
+    hw/.style={rectangle, rounded corners=4pt, draw=red!70!black,
+      fill=red!8, minimum width=6.5cm, minimum height=1.1cm,
+      align=center, font=\small},
+    sensor/.style={rectangle, rounded corners=2pt, draw=gray!60,
+      fill=gray!6, minimum width=2.0cm, minimum height=0.85cm,
+      align=center, font=\scriptsize},
+    arr/.style={->, thick, draw=gray!70!black},
+    bidarr/.style={<->, thick, draw=gray!70!black},
+    lbl/.style={font=\scriptsize, fill=white, inner sep=1.5pt}
+  ]
+  % Nós
+  \node[frontend] (app)    at (0.8,  6.0) {App do Hóspede\\{\scriptsize React Native / Expo}};
+  \node[frontend] (dash)   at (6.0,  6.0) {Dashboard Web\\{\scriptsize React 19 + TypeScript}};
+  \node[backend]  (django) at (3.4,  4.0) {Django REST API\\{\scriptsize Servidor Interceptador + paho-mqtt}};
+  \node[broker]   (mqtt)   at (3.4,  2.0) {HiveMQ Cloud\\{\scriptsize Broker MQTT $\cdot$ TLS 8883}};
+  \node[hw]       (esp32)  at (3.4,  0.0) {Firmware ESP32\\{\scriptsize WiFiClientSecure + PubSubClient}};
+  \node[sensor]   (relay)  at (1.0, -1.9) {Relé\\{\tiny GPIO 26}};
+  \node[sensor]   (mq2)    at (3.4, -1.9) {Sensor MQ-2\\{\tiny GPIO 34}};
+  \node[sensor]   (dht)    at (5.8, -1.9) {Sensor DHT22\\{\tiny GPIO 27}};
+  % Setas interface → backend
+  \draw[arr] (app.south)  -- ++(0,-0.35) -| ([xshift=-1.0cm]django.north)
+      node[pos=0.28, lbl, left] {\texttt{HTTPS/REST}};
+  \draw[arr] (dash.south) -- ++(0,-0.35) -| ([xshift=+1.0cm]django.north)
+      node[pos=0.28, lbl, right] {\texttt{HTTPS/REST}};
+  % Setas backend ↔ broker ↔ ESP32
+  \draw[bidarr] (django) -- (mqtt)
+      node[midway, lbl, right=4pt] {\texttt{publish / subscribe}};
+  \draw[bidarr] (mqtt)   -- (esp32)
+      node[midway, lbl, right=4pt] {\texttt{commands / status / sensors}};
+  % Setas ESP32 → sensores/atuadores
+  \draw[arr] (esp32.south) -| (relay.north);
+  \draw[arr] (esp32.south)  -- (mq2.north);
+  \draw[arr] (esp32.south) -| (dht.north);
+  % Linhas divisoras de camada
+  \draw[dashed, gray!35] (-1.0, 5.05) -- (8.2, 5.05);
+  \draw[dashed, gray!35] (-1.0, 3.05) -- (8.2, 3.05);
+  \draw[dashed, gray!35] (-1.0, 1.05) -- (8.2, 1.05);
+  \draw[dashed, gray!35] (-1.0,-0.95) -- (8.2,-0.95);
+  % Rótulos de camada
+  \node[font=\tiny\itshape, text=gray!70, anchor=east] at (-1.1, 5.5)  {Interfaces};
+  \node[font=\tiny\itshape, text=gray!70, anchor=east] at (-1.1, 4.0)  {Servidor};
+  \node[font=\tiny\itshape, text=gray!70, anchor=east] at (-1.1, 2.0)  {Mensageria};
+  \node[font=\tiny\itshape, text=gray!70, anchor=east] at (-1.1, 0.0)  {Hardware};
+  \end{tikzpicture}
+  \par\smallskip{\footnotesize Fonte: Próprio autor.}
+\end{figure}
+
+\subsection{Diagrama Entidade-Relacionamento do Banco de Dados}
+
+A Figura~\ref{fig:der} apresenta o Diagrama Entidade-Relacionamento das três entidades
+centrais que sustentam a lógica do sistema: \texttt{Fechadura}, \texttt{AcessoTemporario}
+e \texttt{HistoricoEvento}.
+
+\begin{figure}[H]
+  \caption{Diagrama Entidade-Relacionamento do banco de dados.}
+  \label{fig:der}
+  \centering
+  \begin{tikzpicture}[>=Stealth,
+    eheader/.style={rectangle, draw=black, fill=gray!15,
+      minimum width=5.2cm, font=\small\bfseries, align=center,
+      inner xsep=4pt, inner ysep=3pt},
+    eattr/.style={rectangle, draw=gray!50, fill=white,
+      minimum width=5.2cm, font=\footnotesize, text ragged,
+      inner xsep=6pt, inner ysep=2pt},
+    epk/.style={rectangle, draw=gray!50, fill=white,
+      minimum width=5.2cm, font=\footnotesize\bfseries, text ragged,
+      inner xsep=6pt, inner ysep=2pt},
+    efk/.style={rectangle, draw=gray!50, fill=white,
+      minimum width=5.2cm, font=\footnotesize\itshape, text ragged,
+      inner xsep=6pt, inner ysep=2pt},
+    rel/.style={thick, draw=black},
+    card/.style={font=\small}
+  ]
+  %% Fechadura
+  \node[eheader] (fh)  at (0.0,  0.0)  {Fechadura};
+  \node[epk,  below=-\pgflinewidth of fh] (f1) {\underline{id} (PK)};
+  \node[eattr,below=-\pgflinewidth of f1] (f2) {id\_unico (UUID)};
+  \node[eattr,below=-\pgflinewidth of f2] (f3) {nome};
+  \node[eattr,below=-\pgflinewidth of f3] (f4) {id\_dispositivo (MAC)};
+  \node[efk,  below=-\pgflinewidth of f4] (f5) {proprietario (FK → User)};
+  \node[eattr,below=-\pgflinewidth of f5] (f6) {esta\_online};
+  \node[eattr,below=-\pgflinewidth of f6] (f7) {ultima\_comunicacao};
+  %% AcessoTemporario
+  \node[eheader] (ah)  at (7.0,  0.0)  {AcessoTemporario};
+  \node[epk,  below=-\pgflinewidth of ah] (a1) {\underline{id} (PK)};
+  \node[efk,  below=-\pgflinewidth of a1] (a2) {fechadura (FK → Fechadura)};
+  \node[eattr,below=-\pgflinewidth of a2] (a3) {token\_resgate (12 hex)};
+  \node[eattr,below=-\pgflinewidth of a3] (a4) {hospede\_identificador};
+  \node[eattr,below=-\pgflinewidth of a4] (a5) {inicio\_reserva};
+  \node[eattr,below=-\pgflinewidth of a5] (a6) {fim\_reserva};
+  \node[eattr,below=-\pgflinewidth of a6] (a7) {status (5 estados)};
+  %% HistoricoEvento
+  \node[eheader] (hh)  at (0.0, -5.6)  {HistoricoEvento};
+  \node[epk,  below=-\pgflinewidth of hh] (h1) {\underline{id} (PK)};
+  \node[efk,  below=-\pgflinewidth of h1] (h2) {fechadura (FK → Fechadura)};
+  \node[eattr,below=-\pgflinewidth of h2] (h3) {tipo (ACESSO, ALERTA...)};
+  \node[eattr,below=-\pgflinewidth of h3] (h4) {valor\_sensor (Decimal, 4 dp)};
+  \node[eattr,below=-\pgflinewidth of h4] (h5) {descricao};
+  \node[eattr,below=-\pgflinewidth of h5] (h6) {timestamp};
+  %% Relacionamentos
+  \draw[rel] (fh.east) -- (ah.west)
+      node[pos=0.05, above, card] {1}
+      node[pos=0.95, above, card] {N};
+  \draw[rel] (fh.south) -- (hh.north)
+      node[pos=0.05, right, card] {1}
+      node[pos=0.95, right, card] {N};
+  \end{tikzpicture}
+  \par\smallskip{\footnotesize Fonte: Próprio autor.}
+\end{figure}
+
+\subsection{Diagrama de Estados do Acesso Temporário}
+
+A Figura~\ref{fig:estados} apresenta a máquina de estados do \texttt{AcessoTemporario},
+evidenciando as cinco transições possíveis ao longo do ciclo de vida de uma reserva.
+
+\begin{figure}[H]
+  \caption{Máquina de estados do \texttt{AcessoTemporario}.}
+  \label{fig:estados}
+  \centering
+  \begin{tikzpicture}[>=Stealth, shorten >=2pt,
+    every state/.style={minimum size=1.5cm, font=\scriptsize\bfseries,
+      align=center, draw=black!70},
+    trlbl/.style={font=\tiny, fill=white, inner sep=1.5pt, align=center}
+  ]
+  \node[state, initial left, fill=yellow!20]  (pend) at (0,   0) {PENDENTE};
+  \node[state, fill=blue!12]                  (agen) at (3.8, 0) {AGENDADO};
+  \node[state, fill=green!15]                 (ativ) at (7.6, 0) {ATIVO};
+  \node[state, accepting, fill=gray!15]       (expi) at (11.4,0) {EXPIRADO};
+  \node[state, accepting, fill=red!12]        (revo) at (5.7,-3) {REVOGADO};
+  % Fluxo principal
+  \draw[->] (pend) -- (agen)
+      node[midway, above, trlbl] {hóspede resgata\\token};
+  \draw[->] (agen) -- (ativ)
+      node[midway, above, trlbl] {primeiro acesso\\dentro da janela};
+  \draw[->] (ativ) -- (expi)
+      node[midway, above, trlbl] {prazo\\expirado};
+  % Revogação
+  \draw[->, bend right=25] (pend) to
+      node[midway, left,  trlbl] {anfitrião\\revoga} (revo);
+  \draw[->] (agen.south) -- (revo.north)
+      node[midway, left,  trlbl] {anfitrião\\revoga};
+  \draw[->, bend left=25] (ativ)  to
+      node[midway, right, trlbl] {anfitrião\\revoga} (revo);
+  \end{tikzpicture}
+  \par\smallskip{\footnotesize Fonte: Próprio autor.}
+\end{figure}
+
+\subsection{Diagrama de Sequência — Abertura da Porta pelo Hóspede}
+
+A Figura~\ref{fig:sequencia} ilustra o fluxo de mensagens durante uma operação de
+abertura de porta solicitada pelo hóspede, desde o acionamento no aplicativo até
+a atuação do relé no ESP32.
+
+\begin{figure}[H]
+  \caption{Diagrama de sequência da abertura da porta pelo hóspede.}
+  \label{fig:sequencia}
+  \centering
+  \begin{tikzpicture}[>=Stealth, font=\small]
+    % Linhas de vida
+    \foreach \x/\lbl in {
+        0/App Hóspede, 3/Django API, 6/HiveMQ Cloud, 9/ESP32} {
+      \node[draw, minimum width=2.4cm, minimum height=0.7cm,
+            rounded corners=2pt, align=center, font=\scriptsize\bfseries]
+            at (\x, 0) {\lbl};
+      \draw[dashed, gray!50] (\x,-0.35) -- (\x,-7.0);
+    }
+    % Mensagens
+    \draw[->] (0,-0.9) -- (3,-0.9)
+        node[midway, above, font=\scriptsize] {POST /hospede/abrir/};
+    \draw[->] (3,-1.6) -- (3,-1.6)
+        node[right, font=\scriptsize] {Valida token\_resgate e janela temporal};
+    \draw[->] (3,-2.3) -- (6,-2.3)
+        node[midway, above, font=\scriptsize] {publish(``OPEN'')};
+    \draw[->] (6,-3.0) -- (9,-3.0)
+        node[midway, above, font=\scriptsize] {deliver topic: v1/locks/\{MAC\}/commands};
+    \draw[->] (9,-3.7) -- (9,-3.7)
+        node[right, font=\scriptsize] {Aciona relé (GPIO 26) por 3 s};
+    \draw[->] (9,-4.4) -- (6,-4.4)
+        node[midway, above, font=\scriptsize] {publish status: ``ONLINE''};
+    \draw[->] (6,-5.1) -- (3,-5.1)
+        node[midway, above, font=\scriptsize] {deliver topic: v1/locks/\{MAC\}/status};
+    \draw[->] (3,-5.8) -- (3,-5.8)
+        node[right, font=\scriptsize] {Cria HistoricoEvento (ACESSO)};
+    \draw[->] (3,-6.5) -- (0,-6.5)
+        node[midway, above, font=\scriptsize] {HTTP 200 OK};
+  \end{tikzpicture}
+  \par\smallskip{\footnotesize Fonte: Próprio autor.}
+\end{figure}
+
+\subsection{Ferramentas de Hardware e Software}
+
+\subsubsection{Hardware}
+
+\begin{table}[H]
+  \centering
+  \caption{Componentes de hardware do dispositivo embarcado.}
+  \label{tab:hardware}
+  \begin{tabular}{p{3.5cm} p{3.5cm} p{7cm}}
+    \toprule
+    \textbf{Componente} & \textbf{Modelo} & \textbf{Função} \\
+    \midrule
+    Microcontrolador & ESP32 (Espressif) &
+      Processamento central, conectividade Wi-Fi, execução do firmware, controle dos
+      periféricos via GPIO. Processador dual-core, opera em 3,3 V. \\[4pt]
+
+    Sensor de gás/fumaça & MQ-2 &
+      Detecta concentrações de GLP, metano, CO e fumaça. Saída analógica lida via
+      ADC no GPIO 34 do ESP32. Normalizado com 4 casas decimais. \\[4pt]
+
+    Sensor de temp./umidade & DHT22 &
+      Mede temperatura ($-40$ a $80\,^\circ$C, $\pm0,5\,^\circ$C) e umidade relativa
+      (0--100\%, $\pm2\%$). Interface single-wire no GPIO 27. \\[4pt]
+
+    Módulo relé & Relé 5V (1 canal) &
+      Isola eletricamente o circuito de controle (3,3 V) do circuito de potência da
+      fechadura solenoide. Acionado pelo GPIO 26 do ESP32. \\[4pt]
+
+    Fechadura solenoide & Solenoide 12V &
+      Atuador físico da barreira de acesso. Ativada pelo módulo relé mediante
+      recebimento do comando \texttt{OPEN}. \\[4pt]
+
+    LED indicador & LED 5mm (verde) &
+      Sinalização visual de status da conexão e execução de comandos. GPIO 2. \\
+    \bottomrule
+  \end{tabular}
+  \par\smallskip{\footnotesize Fonte: Próprio autor.}
+\end{table}
+
+\subsubsection{Software}
+
+\begin{table}[H]
+  \centering
+  \caption{Tecnologias de software utilizadas no sistema.}
+  \label{tab:software}
+  \begin{tabular}{p{3cm} p{2.8cm} p{8.2cm}}
+    \toprule
+    \textbf{Tecnologia} & \textbf{Versão / Tipo} & \textbf{Papel no sistema} \\
+    \midrule
+    \textbf{C++ (Arduino)} & Arduino Framework &
+      Linguagem do firmware ESP32. Bibliotecas: PubSubClient (MQTT),
+      DHT (sensor DHT22), ArduinoJson (serialização JSON), WiFiClientSecure (TLS). \\[4pt]
+
+    \textbf{Python / Django} & Django 5 + DRF &
+      Backend REST API; modelos ORM; publicação MQTT via paho-mqtt;
+      daemon mqtt\_subscriber para telemetria em tempo real. \\[4pt]
+
+    \textbf{TypeScript / React} & React 19 + Vite &
+      Dashboard web do anfitrião. Shadcn/UI, Tailwind CSS v4, Axios, React Router v6,
+      React Hook Form + Zod. \\[4pt]
+
+    \textbf{React Native / Expo} & Expo SDK 54 &
+      Aplicativo mobile do hóspede (iOS e Android). expo-secure-store para
+      persistência segura do token. \\[4pt]
+
+    \textbf{HiveMQ Cloud} & Broker MQTT (SaaS) &
+      Mensageria MQTT com TLS obrigatório na porta 8883 e autenticação
+      por usuário/senha. Plano gratuito para prototipagem. \\[4pt]
+
+    \textbf{SQLite3 / PostgreSQL} & SQLite (dev) &
+      Banco de dados relacional. SQLite3 para desenvolvimento local;
+      PostgreSQL para produção (migração transparente via ORM Django). \\[4pt]
+
+    \textbf{Git / GitHub} & Monorepo &
+      Controle de versão e hospedagem.
+  \end{tabular}
+  \par\smallskip{\footnotesize Fonte: Próprio autor.}
+\end{table}
+
+\subsection{Fatores de Risco}
+
+\begin{table}[H]
+  \centering
+  \small
+  \caption{Fatores de risco identificados e respectivas estratégias de mitigação.}
+  \label{tab:riscos}
+  \begin{tabular}{p{0.7cm} p{3.2cm} p{2.6cm} p{1.6cm} p{5.4cm}}
+    \toprule
+    \textbf{\#} & \textbf{Risco} & \textbf{Categoria} & \textbf{Impacto} &
+    \textbf{Mitigação} \\
+    \midrule
+
+    R01 & Queda da conexão Wi-Fi no imóvel &
+      Conectividade & Alto &
+      Firmware trata emergências localmente sem servidor. Reconexão automática
+      ao Wi-Fi em loop. \\[3pt]
+
+    R02 & Latência elevada no broker MQTT &
+      Desempenho & Médio &
+      HiveMQ Cloud com SLA de disponibilidade. MQTT assíncrono; meta
+      $<$3\,s monitorada. \\[3pt]
+
+    R03 & Validação de certificado TLS ausente &
+      Segurança & Médio &
+      \texttt{setInsecure()} para prototipagem. Produção usará
+      \texttt{setCACert()} com certificado root HiveMQ. \\[3pt]
+
+    R04 & Clonagem de token de resgate &
+      Segurança & Alto &
+      Token de 12 hex (72 bits de entropia). Após resgate, status muda para
+      AGENDADO, impedindo reutilização. \\[3pt]
+
+    R05 & Imprecisão na leitura do sensor MQ-2 &
+      Precisão & Médio &
+      Normalização com 4 casas decimais. Limiar de alerta calibrável por
+      constante no firmware. \\[3pt]
+
+    R06 & Hardware físico indisponível para testes &
+      Logístico & Alto &
+      Firmware testável no simulador Wokwi. Software testável via API e
+      dashboard sem hardware. \\[3pt]
+
+    R07 & SQLite3 inadequado para produção &
+      Escalabilidade & Baixo &
+      ORM Django suporta migração para PostgreSQL sem alterações no código. \\[3pt]
+
+    R08 & Status online sem WebSocket (polling) &
+      Usabilidade & Baixo &
+      LWT atualiza \texttt{esta\_online} via mqtt\_subscriber.
+      WebSocket previsto como trabalho futuro. \\
+
+    \bottomrule
+  \end{tabular}
+  \par\smallskip{\footnotesize Fonte: Próprio autor.}
+\end{table}
+
+% ============================================================
+% FIM DO DOCUMENTO
+% ============================================================
+\end{document}

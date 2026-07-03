@@ -1,0 +1,60 @@
+{
+  "expo": {
+    "name": "hospede-app",
+    "slug": "hospede-app",
+    "version": "1.0.0",
+    "owner": "fernandofutila",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "newArchEnabled": true,
+    "splash": {
+      "image": "./assets/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "infoPlist": {
+        "NSBluetoothAlwaysUsageDescription": "Usado para abrir a porta da fechadura sem conexão com a internet.",
+        "NSBluetoothPeripheralUsageDescription": "Usado para comunicação com a fechadura via Bluetooth."
+      }
+    },
+    "android": {
+      "package": "com.fernandofutila.hospedeapp",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#ffffff"
+      },
+      "edgeToEdgeEnabled": true,
+      "predictiveBackGestureEnabled": false,
+      "permissions": [
+        "android.permission.BLUETOOTH",
+        "android.permission.BLUETOOTH_ADMIN",
+        "android.permission.BLUETOOTH_SCAN",
+        "android.permission.BLUETOOTH_CONNECT",
+        "android.permission.ACCESS_FINE_LOCATION"
+      ]
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      [
+        "@config-plugins/react-native-ble-plx",
+        {
+          "isBackgroundEnabled": false,
+          "modes": [
+            "central"
+          ],
+          "bluetoothAlwaysPermission": "Usado para abrir a porta da fechadura sem conexão com a internet."
+        }
+      ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "542dec2c-0cef-42ec-be80-106aa67e0eeb"
+      }
+    }
+  }
+}

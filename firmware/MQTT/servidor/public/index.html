@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="pt-BR">
+    <head>
+        <meta charset="UTF-8" />
+        <title>Exemplo MQTT no Browser</title>
+        <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
+    </head>
+    <body>
+        <div>
+            <label>Tópico: </label>
+
+            <button onclick="conecta()">Conectar</button><br />
+            <button onclick="ligaLedVermelho()">Liga led vermelho</button><br />
+            <button onclick="desligaLedVermelho()">Desliga led vermelho</button
+            ><br />
+
+            <button onclick="ligaLedVerde()">Liga led verde</button><br />
+            <button onclick="desligaLedVerde()">Desliga led verde</button>
+            <button onclick="temperatura()">Envia temperatura fake</button>
+        </div>
+
+        <div style="margin-top: 15px">
+            <label>Mensagem: </label>
+            <span id="msg"></span>
+        </div>
+
+        <script>
+            let client;
+            function conecta() {
+                console.log("Tenta conectar no broker....");
+                client = mqtt.connect("wss://broker.emqx.io:8084/mqtt", {
+                    clientId:
+                        "webclient_" + Math.random().toString(16).substr(2, 8),
+                });
+                client.on("connect", function () {
+                    console.log("Conectado ao broker");
+
+                    client.subscribe("ledVERMELHO");
+                    client.subscribe("ledVERDE");
+                    client.subscribe("temperatura");
+                });
+
+                client.on("message", function (topic, message) {
+                    console.log("recebeu msg do topico:" + topic);
+                    console.log(message.toString());
+                });
+                client.on("error", function (err) {
+                    console.log("Erro ", err);
+                });
+                client.on("close", function () {
+                    console.log("Foi desconectado do servidor");
+                });
+            }
+            function temperatura() {
+                if (!client || !client.connected) {
+                    console.log("Não conectado ao broker.");
+                    return;
+                }
+                client.publish("temperatura", "100");
+            }
+            function ligaLedVermelho() {
+                if (!client || !client.connected) {
+                    console.log("Não conectado ao broker.");
+                    return;
+                }
+                client.publish("ledVERMELHO", "1");
+            }
+            function ligaLedVerde() {
+                if (!client || !client.connected) {
+                    console.log("Não conectado ao broker.");
+                    return;
+                }
+                client.publish("ledVERDE", "1");
+            }
+            function desligaLedVerde() {
+                if (!client || !client.connected) {
+                    console.log("Não conectado ao broker.");
+                    return;
+                }
+                client.publish("ledVERDE", "0");
+            }
+            function desligaLedVermelho() {
+                if (!client || !client.connected) {
+                    console.log("Não conectado ao broker.");
+                    return;
+                }
+                client.publish("ledVERMELHO", "0");
+            }
+        </script>
+    </body>
+</html>
