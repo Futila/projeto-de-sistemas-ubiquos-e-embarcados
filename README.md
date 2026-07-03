@@ -1,4 +1,4 @@
-# 🔐 Controle de Acesso Inteligente para Imóveis de Aluguel (IoT)
+# Uma Proposta de Controle de Acesso Inteligente para Imóveis de Aluguel (IoT)
 
 Sistema IoT para controle de acesso em imóveis de curta temporada (estilo Airbnb): chaves digitais temporárias vinculadas a reservas, monitoramento de sensores ambientais (gás e temperatura/umidade) e fallback de abertura offline via Bluetooth (BLE) quando não há internet no local.
 
